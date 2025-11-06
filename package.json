@@ -1,0 +1,17 @@
+{
+  "name": "java-css-project",
+  "version": "1.0.0",
+  "description": "Simple Java + CSS project (no Node.js)",
+  "main": "index.html",
+  "scripts": {
+    "start": "echo 'No build process. Open index.html directly.'",
+    "build": "echo 'Nothing to build. This project uses pure Java and CSS.'"
+  },
+  "keywords": [
+    "java",
+    "css",
+    "frontend"
+  ],
+  "author": "Mostafa",
+  "license": "MIT"
+}
