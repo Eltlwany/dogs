@@ -548,16 +548,12 @@ document.addEventListener('DOMContentLoaded', () => {
           
           
          adFunction().then(() => {
-
                 state.totalEarning += config.AD_REWARD; state.adCount++; state.adsWatchedToday++; state.weeklyActivity[new Date().getDay()]++;
-
-                
-
+                let alertMessage = `AD watched! You have received 5 DOGS`;
                 if (state.adsWatchedToday >= config.DAILY_AD_LIMIT) {
-
                     const cdDate = new Date(); cdDate.setMinutes(cdDate.getMinutes() + config.COOLDOWN_MINUTES);
-
                     state.cooldownUntil = cdDate.toISOString(); state.lastUsedIp = currentIpAddress;
+                    alertMessage = `You have completed your tasks! Please take a ${config.COOLDOWN_MINUTES}-minute break.`;
                 }
                 saveState(); updateUI();
                 safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
