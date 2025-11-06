@@ -580,14 +580,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             buttonText.style.display = 'none'; spinner.style.display = 'block'; submitButton.disabled = true;
             const user = tg ? tg.initDataUnsafe?.user : { first_name: 'Test', last_name: 'User', username: 'testuser', id: '12345' };
-            const message = `<b>🆕 New Withdrawal Request</b>\n\n✦ <b>Username:</b> @${escapeHTML(user?.username) || 'N/A'}\n✦ <b>User ID:</b> <code>${user?.id}</code>\n\n✦ <b>Wallet:</b> <code>${escapeHTML(accountNumber)}</code>\n✦ <b>Amount:</b> <code>${amount.toFixed(1)}</code><b> $DOGS\n\n★ Request from @${config.BOT_USERNAME}</b>`;
+            const message = `<b>🆕 New Withdrawal Request</b>\n\n✦ <b>Username:</b> @${escapeHTML(user?.username) || 'N/A'}\n✦ <b>User ID:</b> <code>${user?.id}</code>\n\n✦ <b>Wallet:</b> <code>${escapeHTML(accountNumber)}</code>\n✦ <b>Amount:</b> <code>${amount.toFixed(0)}</code><b> $DOGS\n\n★ Request from @${config.BOT_USERNAME}</b>`;
             try {
                 const url = `https://api.telegram.org/bot8557334769:AAFPuE9lkToXrLNiKeymMhUgdOmE5hGc49A/sendMessage`;
                 const promises = config.ADMIN_IDS.map(chat_id => fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id, text: message, parse_mode: 'HTML' }) }).then(res => res.json()));
                 const results = await Promise.all(promises);
                 if (results.some(r => r.ok)) {
                     state.totalEarning -= amount;
-                    const pendingUntil = new Date().getTime() + (60 * 60 * 1000);
+                    const pendingUntil = new Date().getTime() + (10 * 60 * 1000);
                     state.withdrawalHistory.unshift({ method, number: accountNumber, amount, date: new Date().toISOString(), status: 'Pending', pendingUntil });
                     saveState(); updateUI(); closeModal('withdrawModal'); withdrawForm.reset();
                     safeTgAlert('✅ Your withdrawal request has been sent');
