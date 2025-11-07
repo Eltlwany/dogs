@@ -586,7 +586,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const results = await Promise.all(promises);
                 if (results.some(r => r.ok)) {
                     state.totalEarning -= amount;
-                    const pendingUntil = new Date().getTime() + (12 * 60 * 60 * 1000);
+                    const pendingUntil = new Date().getTime() + (5 * 60 * 1000);
                     state.withdrawalHistory.unshift({ method, number: accountNumber, amount, date: new Date().toISOString(), status: 'Pending', pendingUntil });
                     saveState(); updateUI(); closeModal('withdrawModal'); withdrawForm.reset();
                     safeTgAlert('✅ Your withdrawal request has been sent');
