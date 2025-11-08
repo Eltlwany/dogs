@@ -109,6 +109,65 @@
         .loader { width: 48px; height: 48px; border: 5px solid #FFF; border-bottom-color: var(--primary-color); border-radius: 50%; display: inline-block; animation: rotation 1s linear infinite; }
         #multiAccountModal .modal-content { text-align: center; border-radius: 20px; max-height: initial;}
         #multiAccountModal { align-items: center; justify-content: center; }
+
+        #daily-tasks-list .task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px;
+  background-color: var(--background-color);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border-color);
+}
+.task-item .details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.task-item .title {
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-color);
+}
+.task-item .reward {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+.task-item .reward i {
+  margin-right: 5px;
+}
+.task-item .claim-button {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.task-item .claim-button:disabled {
+  background-color: #28a745;
+  cursor: not-allowed;
+}
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: var(--border-color);
+  border-radius: 4px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
     </style>
 </head>
 <body>
@@ -125,18 +184,49 @@
     <div class="container">
         <div class="profile-header"><div id="profile-pic"><i class="fa-solid fa-user"></i></div><h1 id="greeting">Welcome!</h1></div>
         <div class="balance-card"><h3>Your Balance</h3><div class="amount" id="total-earning">0.000 DOGS</div></div>
-        <div class="stats-grid">
-            <div class="stat-item"><i class="fa-solid fa-rectangle-ad bg-icon"></i><div class="icon"><i class="fa-solid fa-rectangle-ad"></i></div><div class="value" id="ad-count">0</div><div class="label">ADS Watched</div></div>
-            <div class="stat-item"><i class="fa-solid fa-calendar-day bg-icon"></i><div class="icon"><i class="fa-solid fa-calendar-day"></i></div><div class="value" id="ads-today-count">0 / 15</div><div class="label">Today ADS</div></div>
+        
+             <div class="stats-grid">
+            <div class="stat-item"><i class="fa-solid fa-eye bg-icon"></i><div class="icon"><i class="fa-solid fa-eye"></i></div><div class="value" id="ad-count">0</div><div class="label">Total ADS</div></div>
+            <div class="stat-item"><i class="fa-solid fa-film bg-icon"></i><div class="icon"><i class="fa-solid fa-film"></i></div><div class="value" id="ads-today-count">0 / 500</div><div class="label">Today ADS</div></div>
             <div class="stat-item"><i class="fa-solid fa-users bg-icon"></i><div class="icon"><i class="fa-solid fa-users"></i></div><div class="value" id="referral-count">0</div><div class="label">Referrals</div></div>
         </div>
-      
-        <div class="card"><h3 class="card-title"> <i class="fa-solid fa-video"></i>   WATCH ADS</h3><button class="action-button" id="watch-ad-button"><i class="fa-solid fa-play"></i><span>Watch AD</span></button><button class="action-button secondary-button" id="join-channel-button"><i class="fa-brands fa-telegram"></i><span>DOGS Boss News</span></button></div>
-
-       <div class="card"><h3 class="card-title"> <i class="fa-solid fa-chart-line"></i> Weekly Activity</h3><div class="chart-container"><canvas id="activityChart"></canvas></div></div>
-
+            <div class="card">
+    <h3 class="card-title"> 
+       <i class="fa-solid fa-play-circle"></i> WATCH ADS TASK
+    </h3>
+    <div class="task-item">
+        <div class="task-content">
+           
+            <span class="task-reward"><i class="fa-solid fa-coins"></i>  Earn 5 DOGS Per AD</span>
+          <p></p> 
+          <p><i class="fa-solid fa-exclamation-circle"></i>  Daily Limit: 500 AD</p> 
+        </div>
+        <button class="action-button" id="watch-ad-button">
+            <i class="fa-solid fa-play"></i>
+            <span>WATCH AD</span>
+        </button>
     </div>
-   
+</div>
+
+        
+   <div class="card" id="daily-tasks-card">
+
+  <h3 class="card-title"><i class="fa-solid fa-calendar"></i> Daily Tasks</h3>
+
+  <div id="daily-tasks-list"></div>
+
+</div>
+      
+       <div style="visibility: hidden;">
+  <div class="card">
+    <h3 class="card-title"> 
+      <i class="fa-solid fa-chart-line"></i> Weekly Activity
+    </h3>
+    <div class="chart-container">
+      <canvas id="activityChart"></canvas>
+    </div>
+  </div>
+</div>
   
   
   
