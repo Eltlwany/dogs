@@ -642,6 +642,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     alertMessage = `You have completed your tasks! Please take a ${config.COOLDOWN_MINUTES}-minute break.`;
                 }
                 saveState(); updateUI();
+                renderDailyTasks();
+             
                 safeTgAction(tg => tg.HapticFeedback.notificationOccurred('success'));
                 safeTgAlert(alertMessage);
             }).catch(e => { console.error("AD Error:", e); safeTgAlert('Ad could not be completed. Please try again.'); })
@@ -827,7 +829,197 @@ document.addEventListener('DOMContentLoaded', () => {
       
       
       
+      const dailyTasks = [
+  { id: "checkin", title: "Daily Check-in", reward: 50, type: "checkin", duration: 10, link: "https://t.me/The_DogsBoss" },
+  { id: "watch100", title: "Watch 100 AD", reward: 200, type: "ads100", duration: 10, link: "https://t.me/FREE_TON3" }, 
+  { id: "watch250", title: "Watch 250 AD", reward: 500, type: "ads250" },
+  { id: "watch500", title: "Watch 500 AD", reward: 1000, type: "ads500" },
+  { id: "joinpartner", title: "Join Partner Channel", reward: 50, type: "join", duration: 10, link: "https://t.me/FREE_TON3" }
+];
       
+      // حفظ تاريخ آخر إكمال للمهام اليومية
+function resetDailyTasksIfNeeded() {
+  const now = new Date();
+  const todayUTC = now.toISOString().split('T')[0]; // استخدام UTC بدلاً من التوقيت المحلي
+  
+  if (state.lastDailyReset !== todayUTC) {
+    state.completedDailyTasks = [];
+    state.lastDailyReset = todayUTC;
+    saveState();
+    console.log('Daily tasks reset at:', now.toISOString());
+  }
+}
+
+// حساب الوقت المتبقي حتى منتصف الليل UTC
+function getTimeUntilMidnightUTC() {
+  const now = new Date();
+  const midnightUTC = new Date(Date.UTC(
+    now.getUTCFullYear(),
+    now.getUTCMonth(),
+    now.getUTCDate() + 1, // اليوم التالي
+    0, 0, 0, 0 // 00:00:00
+  ));
+  return midnightUTC.getTime() - now.getTime();
+}
+
+// دمج المهام اليومية في واجهة التطبيق
+document.addEventListener("DOMContentLoaded", () => {
+  resetDailyTasksIfNeeded();
+  renderDailyTasks();
+  
+  // تحديث كل دقيقة للتحقق من المهام
+  setInterval(() => {
+    resetDailyTasksIfNeeded();
+    renderDailyTasks();
+  }, 60000);
+  
+  // جدولة إعادة التعيين في منتصف الليل UTC
+  const timeUntilMidnight = getTimeUntilMidnightUTC();
+  setTimeout(() => {
+    resetDailyTasksIfNeeded();
+    renderDailyTasks();
+    // بعد أول إعادة تعيين، اضبط على 24 ساعة
+    setInterval(() => {
+      resetDailyTasksIfNeeded();
+      renderDailyTasks();
+    }, 24 * 60 * 60 * 1000); // كل 24 ساعة
+  }, timeUntilMidnight);
+});
+
+
+      
+// في دالة renderDailyTasks، قم بتعديل الشروط الخاصة بالمهام المرتبطة بعدد الإعلانات
+function renderDailyTasks() {
+  const container = document.getElementById("daily-tasks-list");
+  if (!container) return;
+  container.innerHTML = "";
+
+  dailyTasks.forEach(task => {
+    const isDone = (state.completedDailyTasks || []).includes(task.id);
+    let buttonText = "Claim";
+    let disabled = false;
+    let progressHTML = "";
+    let progress = 0;
+
+    // استخدام state.adsWatchedToday بدلاً من state.adCount
+    if (task.type === "ads100") {
+      progress = Math.min(state.adsWatchedToday, 100);
+      const percentage = Math.round((progress / 100) * 100);
+      
+      buttonText = `${progress}/100`;
+      if (progress >= 100) buttonText = "Claim";
+      else disabled = true;
+      progressHTML = `<div class="progress-bar"><div class="progress" style="width: ${percentage}%"></div></div>`;
+    }
+    
+    if (task.type === "ads250") {
+      progress = Math.min(state.adsWatchedToday, 250);
+      const percentage = Math.round((progress / 250) * 100);
+      buttonText = `${progress}/250`;
+      if (progress >= 250) buttonText = "Claim";
+      else disabled = true;
+      progressHTML = `<div class="progress-bar"><div class="progress" style="width: ${percentage}%"></div></div>`;
+    }
+    
+    if (task.type === "ads500") {
+      progress = Math.min(state.adsWatchedToday, 500);
+      const percentage = Math.round((progress / 500) * 100);
+      buttonText = `${progress}/500`;
+      if (progress >= 500) buttonText = "Claim";
+      else disabled = true;
+      progressHTML = `<div class="progress-bar"><div class="progress" style="width: ${percentage}%"></div></div>`;
+    }
+    
+    if (task.type === "checkin") {
+      buttonText = isDone ? "Done" : "Check";
+    }
+    
+    if (task.type === "join") {
+      buttonText = isDone ? "Done" : "Join";
+    }
+
+    const button = document.createElement("button");
+    button.className = `claim-button ${isDone ? "completed" : ""}`;
+    button.textContent = isDone ? "Done" : buttonText;
+    button.disabled = isDone || disabled;
+
+    if (!isDone && !disabled) {
+      button.addEventListener("click", () => handleDailyTask(task, button));
+    }
+
+    const item = document.createElement("div");
+    item.className = "task-item";
+    item.innerHTML = `
+      <div class="task-details">
+        <div class="task-title">${task.title}</div>
+        <div class="task-reward"><span class="reward"><i class="fa-solid fa-gift"></i> Reward: ${task.reward} DOGS</div>
+        ${progressHTML}
+      </div>
+    `;
+    item.appendChild(button);
+    container.appendChild(item);
+  });
+}
+
+// في دالة handleDailyTask، قم بتعديل الشروط أيضًا
+function handleDailyTask(task, btn) {
+  if (!state.completedDailyTasks) state.completedDailyTasks = [];
+  if (state.completedDailyTasks.includes(task.id)) return;
+  
+  if (task.type === "checkin") {
+    safeTgAction(tg => tg.openLink(task.link));
+    btn.disabled = true;
+    btn.textContent = "Checking...";
+    setTimeout(() => {
+      state.completedDailyTasks.push(task.id);
+      state.totalEarning += task.reward;
+      saveState();
+      updateUI();
+      btn.textContent = "Done";
+      btn.className = "claim-button completed";
+      btn.disabled = true;
+      safeTgAction(tg => tg.HapticFeedback.notificationOccurred("success"));
+    }, task.duration * 1000);
+    return;
+  }
+
+  if (task.type === "join") {
+    safeTgAction(tg => tg.openLink(task.link));
+    btn.disabled = true;
+    btn.textContent = "Checking...";
+    setTimeout(() => {
+      state.completedDailyTasks.push(task.id);
+      state.totalEarning += task.reward;
+      saveState();
+      updateUI();
+      btn.textContent = "Done";
+      btn.className = "claim-button completed";
+      btn.disabled = true;
+      safeTgAction(tg => tg.HapticFeedback.notificationOccurred("success"));
+    }, task.duration * 1000);
+    return;
+  }
+
+  // التحقق من الشروط باستخدام state.adsWatchedToday بدلاً من state.adCount
+  if (
+    (task.type === "ads100" && state.adsWatchedToday < 100) ||
+    (task.type === "ads250" && state.adsWatchedToday < 250) ||
+    (task.type === "ads500" && state.adsWatchedToday < 500)
+  ) return;
+
+  // إكمال المهمة
+  state.completedDailyTasks.push(task.id);
+  state.totalEarning += task.reward;
+  saveState();
+  updateUI();
+  btn.textContent = "Done";
+  btn.className = "claim-button completed";
+  btn.disabled = true;
+  safeTgAction(tg => tg.HapticFeedback.notificationOccurred("success"));
+}
+      
+    
+
       
 
         function showModal(modalId, buttonEl) {
@@ -972,6 +1164,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 await initDB(); 
                 await loadState();
+                renderDailyTasks();
 
                 const currentUserId = tg ? tg.initDataUnsafe?.user?.id : null;
                 if (currentUserId) {
