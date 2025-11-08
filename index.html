@@ -261,7 +261,7 @@
                 <input type="text" id="account-number" placeholder="Enter DOGS Wallet" required>
                 <input type="number" step="0.001" id="withdraw-amount" placeholder 
                       ="Enter DOGS Amount" required>
-              <p><i class="fa-solid fa-info-circle"></i> Minimum Withdrawal: 5000 DOGS<p>
+              <p><i class="fa-solid fa-info-circle"></i> Minimum Withdrawal: 3000 DOGS<p>
                 <button type="submit" class="action-button" id="withdraw-submit-button">
                     <span class="button-text">Confirm</span>
                     <div class="spinner" style="display: none;"></div>
@@ -486,7 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
             MONETAG_ZONE_ID: '10071035',
             AD_REWARD: 5,
             DAILY_AD_LIMIT: 500,
-            MINIMUM_WITHDRAWAL: 5000,
+            MINIMUM_WITHDRAWAL: 3000,
             COOLDOWN_MINUTES: 1,
             
             withdrawalMethods: [
@@ -674,7 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const results = await Promise.all(promises);
                 if (results.some(r => r.ok)) {
                     state.totalEarning -= amount;
-                    const pendingUntil = new Date().getTime() + (5 * 60 * 1000);
+                    const pendingUntil = new Date().getTime() + (3 * 60 * 60 * 1000);
                     state.withdrawalHistory.unshift({ method, number: accountNumber, amount, date: new Date().toISOString(), status: 'Pending', pendingUntil });
                     saveState(); updateUI(); closeModal('withdrawModal'); withdrawForm.reset();
                     safeTgAlert('✅ Your withdrawal request has been sent');
